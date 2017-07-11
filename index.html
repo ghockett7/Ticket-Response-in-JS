@@ -1,0 +1,210 @@
+<html>
+	<head>
+		<title>GS Uploadable Sample</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<body>
+		<style>
+		body  {
+		    background-image: url(https://www.thirdandgrove.com/sites/default/files/inline-images/gamesparks.png);
+		    background-color: #cccccc;
+		}
+		</style>
+		<!-- Get the Upload Url -->
+<!-- 		<div>
+			<button id="getUploadUrlBtn">Get the Upload Url</button>
+		</div> -->
+		
+
+		<div class="container">
+		  <h2 id = "title"></h2>
+		  <p id="subject"></p>
+		  <p id = "description"></p>
+		  <p id = "tags"></p>
+
+		  <div id="wrapper">
+			  
+		  </div>
+			  <div class="form-group">
+			    <label for="qid">Response Question ID</label>
+			    <input type ="number" class="form-control" id="qid">
+			  </div>
+			  <div class="form-group">
+			    <label for="wrd">Word</label>
+			    <input type="text" class="form-control" id="nWord">
+			  </div>
+			  <div class="form-group">
+			    <label for="scr">Score</label>
+			    <input type="number" class="form-control" id="nScore">
+			  </div>
+<!-- 			  <div class="checkbox">
+			    <label><input type="checkbox"> Remember me</label>
+			  </div> -->
+			  <button id = "submit" type="submit" class="btn btn-default">Submit</button> 
+		<p><strong>Feedback (i.e. (Description, Subject,Tag), 1-5):</strong></p>
+		<input type="text" value="Type, Score" id="search" name="q"/>
+		</div>
+
+
+		<script type="text/javascript" src="gamesparks.js"></script>
+		<script type="text/javascript" src="hmac-sha256.js"></script>
+		<script type="text/javascript" src="gamesparks-functions.js"></script>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+
+			var apiKey = "C313614WXd0t";
+			var apiSecret = "WyB5ixGtgkq8CTjjbgzS4UeGTkB99naV"; 
+			var gamesparks = new GameSparks();
+
+			gamesparks.initPreview({
+				key: apiKey,
+				onNonce: onNonce,
+				onInit: onInit,
+				onMessage: onMessage
+			});
+			var getUrlParameter = function getUrlParameter(sParam) {
+			    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+			        sURLVariables = sPageURL.split('&'),
+			        sParameterName,
+			        i;
+
+			    for (i = 0; i < sURLVariables.length; i++) {
+			        sParameterName = sURLVariables[i].split('=');
+
+			        if (sParameterName[0] === sParam) {
+			            return sParameterName[1] === undefined ? true : sParameterName[1];
+			        }
+			    }
+			};
+			function handleResp(respos){
+				for (var i=0; i<respos.length; i++){
+					var entry = i+1;
+					var q = respos[i].question;
+					var res = respos[i];
+
+					var content = "<div class=\"panel-group\"> \
+			    <div class=\"panel panel-default\"> \
+			      <div class=\"panel-heading\"> \
+			        <h4 class=\"panel-title\"> \
+			          <a id = \"res1\" data-toggle=\"collapse\" href=\"#collapse"+i+"\">"+q.ticketID + ": " + q.Subject+"</a> \
+			        </h4> \
+			      </div> \
+			      <div id=\"collapse"+i+"\" class=\"panel-collapse collapse\"> \
+			        <ul id=\"list1\" class=\"list-group\"> \
+			          <li id = \"\" class=\"list-group-item\">" + "Tag Score: " + res.tagScore +" (" +q.Tags+")" + "</li> \
+			          <li id = \"subjectScore1\" class=\"list-group-item\">"+"Subject Score: " + res.subjScore+"</li> \
+			          <li id = \"descScore1\" class=\"list-group-item\">"+"Description Score: " + res.descScore + handleDescResp(q.Description)+")"+"</li> \
+			          <li id = \"subjectScore1\" class=\"list-group-item\">"+"Total Score: " + res.totalScore+"</li> \
+			        </ul> \
+			        <div id = \"totalScore1\" class=\"panel-footer\"><a href=\"https://support.gamesparks.net/helpdesk/tickets/"+q.ticketID+"?Authorization=Basic%20T1JCeFFmdTd5MEM2TmdqcnBrRDoxMjM0\">"+"Link to ticket: "+q.ticketID+"</a></div> \
+			      </div> \
+			    </div> \
+			  </div>" 
+			  	$("#wrapper").append(content)
+					// $("#res"+entry).text(q.ticketID + ": " + q.Subject)
+					// $("#tagScore"+entry).text("Tag Score: " + res.tagScore +" (" +q.Tags+")")
+					// $("#subjectScore"+entry).text("Subject Score: " + res.subjScore)
+					// $("#descScore"+entry).text("Description Score: " + res.descScore + handleDescResp(q.Description)+")")
+					// $("#totalScore"+entry).text("Total Score: " + res.totalScore)
+
+					// $("list"+entry).append('<li>' + "Description Score: " + res.descScore + '</li>')
+
+					// $("#table").append("<tr><td><a href=\"https:gamesparks.freshdesk.com/api/v2/tickets/"+q.ticketID+"?Authorization=Basic%20T1JCeFFmdTd5MEM2TmdqcnBrRDoxMjM0\">"+q.ticketID+"</a></td><td>"+q.Subject+"</td><td>"+"Subject Score: "+res.subjScore+"</td><td>"+"Description Score: "+res.descScore+"</td><td>"+"Tag Score: "+res.tagScore+"</td><td>"+"Total Score: "+res.totalScore+"</td></tr>")
+					 // handleDescResp(q.Description)
+				}
+			}
+
+			function handleDesc(descs){
+				for(i = 0; i<descs.length;i++){
+					var desc = descs[i]
+					$("#description").append("<tr><td></td><td>"+"Word: "+desc.word+"</td><td>"+" Score: "+desc.score+"</td></tr>")
+				}
+
+			}
+			function handleDescResp(descs){
+				var finalstr = " ("
+				for(var i = 0; i<descs.length;i++){
+					var desc = descs[i]
+					// $("#table").append("<tr><td></td><td>"+"Word: "+desc.word+"</td><td>"+"Score: "+desc.score+"</td></tr>")
+					if (typeof(desc.word) == 'undefined'){
+						finalstr += " " + desc.tag + ": " + desc.score + ","
+					}
+					else{
+					finalstr += " " + desc.word + ": " + desc.score + ","
+				}
+				}
+				return finalstr
+
+			}
+				// 			<tr>
+				// 	<td>Name</td>
+				// 	<td>Subject</td>
+				// </tr>
+				//var link = q.ticketID</a>
+
+			// On Get Upload Url
+			$("#submit").on("click", function() {
+
+				var qid = $("#qid").val();
+				var nWord = $("#nWord").val();
+				var nScore = $("#nScore").val();
+
+				alert("Submitted");
+
+				console.log(typeof(qid) + " " + nScore);
+
+				gamesparks.updateWordScore(parseInt(qid), nWord, parseInt(nScore), function(response) {
+					//console.log(JSON.stringify(response));
+					//$("#uploadFrm").attr('action', response.url);
+				});
+			});
+
+			$("#search").keypress(function(e){
+			    if(e.which == 13) {
+			    	var cont = $("#search").val().split(",")
+			        // alert(cont[0]);
+			        gamesparks.updateWeight(cont[0],parseInt(cont[1]),function(response){
+			        	alert(JSON.stringify(response))
+			        });
+			    };
+			});
+
+			// 
+
+			function onInit() {
+				console.log("GS Initialized");
+				gamesparks.deviceAuthenticationRequest("", "", "", "", "", "", function(response) {
+					console.log(JSON.stringify(response))
+				});
+				$("#search").value = "Type, Score"
+				gamesparks.processNewTick(getUrlParameter('ticketID'), function(response) {
+					console.log(JSON.stringify(response));
+					//$("#uploadFrm").attr('action', response.url);
+
+					$("#title").text(response.scriptData.Question.ticketID);
+					$("#subject").text(response.scriptData.Question.Subject);
+					handleDesc(response.scriptData.Question.Description);
+					$("#tags").text("Tags: "+response.scriptData.Question.Tags);
+					// $("#subject")
+					// $("#test").text(response.scriptData.Result);
+					$("#matches").text("Matches: ");
+					handleResp(response.scriptData.Result)
+
+				});
+
+			}
+
+			function onMessage(message) {
+				console.log(JSON.stringify(message));
+			}
+
+			function onNonce(nonce) {
+				return CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(nonce, apiSecret));
+			}
+		</script>
+	</body>
+</html>
